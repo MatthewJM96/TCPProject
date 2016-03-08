@@ -1,0 +1,777 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     28805,        768]
+NotebookOptionsPosition[     26722,        693]
+NotebookOutlinePosition[     27068,        708]
+CellTagsIndexPosition[     27025,        705]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ StyleBox["Numerical Solver of 1D Infinite Well", "Title"],
+ "\n",
+ StyleBox["This script is a numerical Solver for the 1D infinite well \
+scenario utilising finite differences of the second order derivative.",
+  FontSize->16]
+}], "Text",
+ CellChangeTimes->{{3.6655967139200063`*^9, 3.6655967326220036`*^9}, {
+  3.6656014486247053`*^9, 3.665601476891393*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Preparing Values", "Section",
+ CellChangeTimes->{{3.6656014962872944`*^9, 3.665601498082746*^9}}],
+
+Cell[TextData[{
+ StyleBox["m",
+  FontSlant->"Italic"],
+ " is mass, where here it is set to that of the electron rest mass in ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"eV", "\[CenterDot]", 
+    SuperscriptBox["s", "2"], "\[CenterDot]", 
+    SuperscriptBox["m", 
+     RowBox[{"-", "2"}]]}], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ".\n",
+ StyleBox["A",
+  FontSlant->"Italic"],
+ " is the width of the infinite well in ",
+ Cell[BoxData[
+  FormBox[
+   SuperscriptBox["m", "2"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ".\n",
+ StyleBox["a",
+  FontSlant->"Italic"],
+ " is the width of the segments of the infinite well for the finite \
+differences approximation, in the same units."
+}], "Text",
+ CellChangeTimes->{{3.66560134018928*^9, 3.665601419026821*^9}, {
+  3.665601568135995*^9, 3.665601666948174*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"m", " ", "=", " ", 
+   RowBox[{"0.511", "*", 
+    RowBox[{
+     RowBox[{"10", "^", "6"}], "/", 
+     RowBox[{"(", 
+      RowBox[{"9", "*", 
+       RowBox[{"10", "^", "16"}]}], ")"}]}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"A", " ", "=", " ", 
+   RowBox[{"0.53", "*", 
+    RowBox[{"10", "^", 
+     RowBox[{"-", "10"}]}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"a", " ", "=", " ", 
+   RowBox[{"A", "/", "101"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6655970305585513`*^9, 3.6655970323630533`*^9}, 
+   3.6655994368391943`*^9, {3.6656002761030264`*^9, 3.665600307510132*^9}, {
+   3.6656005040640707`*^9, 3.6656005061688557`*^9}, {3.6656016034873295`*^9, 
+   3.665601614480591*^9}, {3.665602453939183*^9, 3.665602456137717*^9}, {
+   3.665602641555915*^9, 3.665602643319249*^9}, {3.6656040608576765`*^9, 
+   3.66560406479548*^9}, {3.665604632351206*^9, 3.6656046324143887`*^9}}],
+
+Cell["\<\
+n is the number of steps segmenting the domain of the infinite well.\
+\>", "Text",
+ CellChangeTimes->{{3.6655967821525154`*^9, 3.6655968223304434`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"n", " ", "=", " ", "100"}], ";"}]], "Input",
+ CellChangeTimes->{{3.6655968890353074`*^9, 3.6655968912448783`*^9}, 
+   3.6655994400990963`*^9, {3.6656040864351873`*^9, 3.665604087068425*^9}, {
+   3.665604567885811*^9, 3.6656046119906006`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Preparing Eigensystem", "Section",
+ CellChangeTimes->{{3.66560202678715*^9, 3.665602032101742*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"getMatrixElement", "[", 
+    RowBox[{"x_", ",", "y_"}], "]"}], " ", ":=", " ", "\[IndentingNewLine]", 
+   RowBox[{"If", " ", "[", 
+    RowBox[{
+     RowBox[{"x", "\[Equal]", "y"}], ",", " ", "2", ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"x", "\[Equal]", 
+        RowBox[{"y", "-", "1"}]}], ",", " ", 
+       RowBox[{"-", "1"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"x", "\[Equal]", 
+          RowBox[{"y", "+", "1"}]}], ",", 
+         RowBox[{"-", "1"}], ",", " ", "0"}], "]"}]}], "]"}]}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.6655974626390667`*^9, 3.665597604645409*^9}, {
+  3.665597703770674*^9, 3.6655977041376853`*^9}, {3.6656016874907084`*^9, 
+  3.6656017357905493`*^9}}],
+
+Cell["\<\
+Here we construct the matrix resulting from applying the finite differences \
+approximation to the TISE.\
+\>", "Text",
+ CellChangeTimes->{{3.66560174898081*^9, 3.6656017706118345`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"finiteDifferencesMatrix", " ", "=", " ", 
+   RowBox[{"Table", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"Table", " ", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"getMatrixElement", "[", 
+        RowBox[{"j", ",", "i"}], "]"}], "\[IndentingNewLine]", ",", 
+       RowBox[{"{", 
+        RowBox[{"j", ",", " ", "1", ",", " ", "n"}], "}"}]}], "]"}], 
+     "\[IndentingNewLine]", ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", " ", "1", ",", " ", "n"}], "}"}]}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.6655970738748755`*^9, 3.665597074957849*^9}, {
+   3.66559711808422*^9, 3.665597130215645*^9}, {3.6655971857100163`*^9, 
+   3.6655972021929507`*^9}, {3.6655972723692217`*^9, 
+   3.6655972731268125`*^9}, {3.665597303488142*^9, 3.665597419061822*^9}, {
+   3.6655976592040434`*^9, 3.66559767500708*^9}, {3.665597728810533*^9, 
+   3.6655977424720645`*^9}, {3.665599431423814*^9, 3.665599479107644*^9}, 
+   3.66560169770831*^9, 3.6656047529230957`*^9, 3.6656048436464553`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Solving Eigenproblem and Plotting Results", "Section",
+ CellChangeTimes->{{3.6656020428582554`*^9, 3.6656020784003925`*^9}, {
+  3.6656023776687264`*^9, 3.6656023783089733`*^9}}],
+
+Cell["Solve the eigenproblem and obtain the resulting eigensystem.", "Text",
+ CellChangeTimes->{{3.6656023596894193`*^9, 3.665602374240859*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"eigensystem", " ", "=", " ", 
+   RowBox[{"Eigensystem", "[", "finiteDifferencesMatrix", "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.6656020854066153`*^9, 3.6656020959796534`*^9}}],
+
+Cell["\<\
+This shows the first harmonic of the wave function for a particle in the \
+constructed infinite well, and its respective energy.\
+\>", "Text",
+ CellChangeTimes->{{3.6656018375420065`*^9, 3.6656018897681684`*^9}, 
+   3.665602260610083*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"(", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"N", "[", 
+      RowBox[{"eigensystem", "[", 
+       RowBox[{"[", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "1"}]}], "]"}], "]"}], "]"}], " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"6.582", "*", 
+         RowBox[{"10", "^", 
+          RowBox[{"-", "16"}]}]}], ")"}], "^", "2"}], ")"}]}], ")"}], " ", 
+   "/", " ", 
+   RowBox[{"(", 
+    RowBox[{"2", " ", "*", " ", "m", " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{"a", "^", "2"}], ")"}]}], ")"}]}], ")"}]], "Input",
+ CellChangeTimes->{{3.6655995085883584`*^9, 3.6655995603519583`*^9}, {
+   3.6656017802393456`*^9, 3.665601793906954*^9}, 3.665601909415577*^9, {
+   3.665601987032881*^9, 3.6656019918115263`*^9}, {3.6656021076314535`*^9, 
+   3.6656021301751537`*^9}, {3.6656028509909954`*^9, 3.6656028617275352`*^9}}],
+
+Cell[BoxData["134.03566086597914`"], "Output",
+ CellChangeTimes->{{3.6656021244922714`*^9, 3.665602137483198*^9}, 
+   3.6656022551005077`*^9, 3.6656023460189466`*^9, 3.6656024596216955`*^9, 
+   3.6656026604289*^9, 3.665602863212599*^9, 3.665604703666304*^9, 
+   3.665605169835647*^9, 3.666382951240615*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ListPlot", "[", 
+  RowBox[{"eigensystem", "[", 
+   RowBox[{"[", 
+    RowBox[{"2", ",", 
+     RowBox[{"-", "1"}]}], "]"}], "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.66560215905782*^9, 3.6656021786094136`*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.009166666666666668], 
+     AbsoluteThickness[1.6], PointBox[CompressedData["
+1:eJxdlVlIVGEUx29mbg8uTGnkvluauI3OuB5HHR33WZyZohdFIRcQMqQE8ct8
+CjRXygIxtEgyRcXKMLqG2pAR9WCRTpmVBTaJmIRG2oLnPpx74fLx43+59/vO
++Z//9S2p1pRZcRxX+u/+v+5d6yl05eBktV27/e8/yHZgkA/fkGzZwh47g1/E
+1FyUxQn5IDTWDnJSiwT5MPS8/3au+J0bsgfsNAcs9ZvckX3gw/0rD23ueiP7
+QcezMn/TtC9yAOzU6Iy3hvyRg+D47ZaB/o5A5BC4dq97O7smGPkY7P4w1fvl
+HUUOA5VhYHHcJxQ5HE5/dlG2fQ9DjoCo0VfdirFw5Eholv2aHJRFIEeBTD43
+PiaJRI6GTzd7txpWBY4BS/CKxjwZhSyFriP6O52XopFjYWdk1bFWG4McB11p
+Zx7lu0mRZeDZ+kW6Ni+wHCz7qhWBl2OR42F1xcV6VhGHnAAfJ5x3+9YFToSN
+xxafzqsy5CSo83CZr4qXIydD7YL3AZvXAqeAp2opWF4ZjwxQmjSjWt5GZgDZ
+C56uixcSUE+FketzS9b7E1FPBavzPQPJ9cicAl44QnjFuqArwP3t6NeKU0mo
+p8GhvhLXoClklgaRVdNPG72SUU+H515N5vKzyCwdWlqTHWefCHoGlBfPbl60
+T0E9A2IrNxzas5A5JUjbNkc/NAi6EtLMcfElw4KeCb1r02aHN4KeCaFboaaX
+PwU9C0Imth31toB6FjxomqnLcULmVODnsTyklAi6iLls+jzLpu/jcuj3WA7d
+D5dL98ty6Xm4PHpelkfrweXTerF8Wk+ugNabFdB+cIW0X1Ao6mch7TdfSP3A
+qalfQC3yk5r6jVeL/KihfgUN9TPTUL/zGtE8aOm8gJbOE9PSeeO1onnU0XkF
+HZ1npqPzzutEeVBE8wKKaJ6wIpo3fJEoj/Q0r0BP84zpad7xelEeGmhegoHm
+KTPQvOUNojw20rwGI81zZqR5zxtF/4MT+J71lL9Y96s5
+      "]]}, {}}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{0, 0},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 100.}, {0, 32.150594577710095`}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.02], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{3.665602125290429*^9, 3.665602162249526*^9, 
+  3.6656022551260757`*^9, 3.665602346049029*^9, 3.66560245964476*^9, 
+  3.665602660493579*^9, 3.665604703699397*^9, 3.6663829513248405`*^9}]
+}, Open  ]],
+
+Cell["\<\
+This shows the second harmonic of the wave function for a particle in the \
+constructed infinite well, and its respective energy.\
+\>", "Text",
+ CellChangeTimes->{{3.665602283950548*^9, 3.6656022944878845`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"(", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"N", "[", 
+      RowBox[{"eigensystem", "[", 
+       RowBox[{"[", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "2"}]}], "]"}], "]"}], "]"}], " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"6.582", "*", 
+         RowBox[{"10", "^", 
+          RowBox[{"-", "16"}]}]}], ")"}], "^", "2"}], ")"}]}], ")"}], " ", 
+   "/", " ", 
+   RowBox[{"(", 
+    RowBox[{"2", " ", "*", " ", "m", " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{"a", "^", "2"}], ")"}]}], ")"}]}], ")"}]], "Input",
+ CellChangeTimes->{{3.665599577880911*^9, 3.6655995790300627`*^9}, {
+  3.665602004947605*^9, 3.6656020066778708`*^9}, {3.665602187769987*^9, 
+  3.665602217510041*^9}, {3.665605112008549*^9, 3.665605114912018*^9}}],
+
+Cell[BoxData["536.0129726185846`"], "Output",
+ CellChangeTimes->{3.665599582165121*^9, 3.6656005895681505`*^9, 
+  3.6656021254283075`*^9, 3.665602255134097*^9, 3.6656023460560474`*^9, 
+  3.665602459650275*^9, 3.6656026605011015`*^9, 3.6656047037144394`*^9, 
+  3.665605172706503*^9, 3.6663829513308563`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ListPlot", "[", 
+  RowBox[{"eigensystem", "[", 
+   RowBox[{"[", 
+    RowBox[{"2", ",", 
+     RowBox[{"-", "2"}]}], "]"}], "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.6655993367223206`*^9, 3.6655993669747896`*^9}, 
+   3.6656021958545856`*^9}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.009166666666666668], 
+     AbsoluteThickness[1.6], PointBox[CompressedData["
+1:eJw9lWtIk2EUx2dmVqZpNcuUnOY97+uipu6om5pu7t3mLlKYhEZ9MEnJDE1H
+IvghpYQuIGYlqJGaZhcjRE2bCH2xMstIrPRTJQsXgXZn/9NgjN/+7+/d+zzP
+OWd+R0q0RatEIlHh3/e/T/vLKsPnEL6gntL8tGDrb/Ba6um/ddgw5zxsZ3dS
+HWvNX+rdCN5CoveVVzz7NoO3UV7Jjcex5VvBPtRWYZVtCvAGSyhCkCrdH+4A
++5PTxIxuUuwHDqCRc0dbIof8wUF0/K7i0bI+ABxCT15eG7n5OhAcRp5RstEO
+RTA4nHrkH+KuN4eAIyndJjsZ/yYUHE3fWqpn436GgWOo1XNQdXZNODiWCt/W
+OIlszFJ68WphYmosArybGh3ankZVRIL3UKPvjOGQaxR4L80+WD80Xsu8jzod
+iu7/mGGOI+PpM8XaddHgeNre5FEvFzMnUGh771SmB/N+yr5ad8GyzH4i2eSr
+Q9X9zElU/m4+sVTJnEwHFzq6Lln4+WSUZCrYkOzPTLT4pVDiVoD1mIm6o7wT
+LWZebwrdc66qTavbhTyFxGVu7jUneL9SaTolZvl8EvbTnEquyZ0ZzUu8/2k0
+3lA5bL0YhDyNypo0tz958XnJqX6ytlTUsBO5nITqdOnAZz5/BUls6rg7CRLk
+CgqschwN+uqDPJ2KY9U2ueCFPJ3GE+Z/CZfFyDNI2j3Wt2LxQJ5BeeJ2D89n
+Lsgz6WNHzFzXoiPyTKp29512WfmOej9AA4PPT604zNnZ/J/RJ1l8vZ3NWXw/
+sufZ/Ht2Nmfz8yBX8vMiV/J6kKt4vchVvB/Ic3i/kOfwfiJX834jV/N5IBf4
+vOxMAp8nrhf4vO08LHA9wNdwvcDXcD3B13C9wddwPcLXcr3C13I9w9dyvcPX
+cj/A13G/wNdxP8HXcb/B13E/ws/lfoWfy/0MP5f7HX4uzwP4ep4X8PU8T+Dr
+ed7A1/M8gm/geQXfwPMMvoHnHXwDz0P4Rp6X8I08T+Ebed7CN/I8hm/ieQ3f
+xPMcvonnPXwT/x+g/vNwH6vsD8NbtCU=
+      "]]}, {}}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{0, 0},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 100.}, {-16.08307695797894, 16.08307695797894}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{3.6655993735617485`*^9, 3.6656005903216825`*^9, 
+  3.6656021261938753`*^9, 3.665602255154652*^9, 3.665602346078107*^9, 
+  3.6656024596698275`*^9, 3.6656026605803127`*^9, 3.6656047037515388`*^9, 
+  3.6663829514221015`*^9}]
+}, Open  ]],
+
+Cell["\<\
+This shows the third harmonic of the wave function for a particle in the \
+constructed infinite well, and its respective energy.\
+\>", "Text",
+ CellChangeTimes->{{3.665602299243386*^9, 3.665602303099454*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"(", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"N", "[", 
+      RowBox[{"eigensystem", "[", 
+       RowBox[{"[", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "3"}]}], "]"}], "]"}], "]"}], " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"6.582", "*", 
+         RowBox[{"10", "^", 
+          RowBox[{"-", "16"}]}]}], ")"}], "^", "2"}], ")"}]}], ")"}], " ", 
+   "/", " ", 
+   RowBox[{"(", 
+    RowBox[{"2", " ", "*", " ", "m", " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{"a", "^", "2"}], ")"}]}], ")"}]}], ")"}]], "Input",
+ CellChangeTimes->{{3.6655995888324366`*^9, 3.6655995889171643`*^9}, {
+  3.6656022041758776`*^9, 3.6656022136444144`*^9}, {3.665602313159998*^9, 
+  3.665602315016592*^9}, {3.6656051188091927`*^9, 3.665605121524149*^9}}],
+
+Cell[BoxData["1205.543048169989`"], "Output",
+ CellChangeTimes->{3.665599591785557*^9, 3.665600590380846*^9, 
+  3.6656021262389994`*^9, 3.665602255163175*^9, 3.6656023460856256`*^9, 
+  3.665602459677849*^9, 3.6656026605863285`*^9, 3.6656047037595596`*^9, 
+  3.665605175322668*^9, 3.6663829514281178`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ListPlot", "[", 
+  RowBox[{"eigensystem", "[", 
+   RowBox[{"[", 
+    RowBox[{"2", ",", 
+     RowBox[{"-", "3"}]}], "]"}], "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.66559933865508*^9, 3.665599367537349*^9}, {
+  3.6656022019197044`*^9, 3.665602202692814*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.009166666666666668], 
+     AbsoluteThickness[1.6], PointBox[CompressedData["
+1:eJxdlVtIFGEUx6dF02wt8Vpq6+p6w3Sxq5dyPV7Wu+7FdXcFS1ETL7UVqSiU
+fD0kmRBoPWhRmBqaINGNTAynh0IhFCITY2WzkDI1FiJNH7JizzycGRiGH//h
+m/N953/+E1x+Vn9KwnFc5b/7/9Nx2ZPpk4Nle7NziXUL2RXWlPYx24gLONgD
+HphtP14U7Eb2BtnDldY6jRfyHogo5y80vvVFDoT6ytaGEV9/ZDlYrn2omA/f
+hxwC0yea2zzXgpBDIXOjZ9ktORg5HJSuxd/vlYQgR8KnZ8N+ep0COQrKJy5X
+bfqHIkdD/rC9b+65wEp4dGmptDM8DDkWFNUd6zFVAh8AVc/AqKxR4IPQ4qaI
+SDEKfAhsXTnx1u0CH4bKyK6JnqvC+kdgwOuNy6BVqOcoJEoaXM87CRwHp2Pm
+a+e3CfXHw4JtfX/MrBw5ASbtq+k/3YX9J8KSrbqmNDIQ+RhkN/0Z9HTai3wc
+5O437koHfZCTYHq93nkywBNZBbfMksCTU1LkZIhefH9lK9QZGaDjZnX3ru5N
+R38ZgLpso+Vl8SL2OwUammYHyktmxh16CsSNt7+L0vxyMJcKY739Tz+3S3iH
+ngpBnXdWbBluDubSoEPaXzX0xQP1NLC4WUbVLd6op8PvsJqpxGU/1NNB9XpG
++S0kAHU1bEzO+SpkMtTVkHD91RNFnRz1DIgeOpPQ1xuMegb4GKRJHx+HoJ4J
+t79aymq7Fahnwv2LOne9IRT1LDDFVqzaF5BZFqisw207U8JQz4aI6twdU+eQ
+mYi5HPo+y6Hrcbn0eyyX1sPl0XpZHt0Pl0/3y/LpeXAF9LxYAT1PTkPPm2lo
+Pzgt7RdoRf3U0n7zWuoHTkf9AjqRn3TUb7xO5Ec99SvoqZ+Znvqd14vmoZDO
+CxTSeWKFdN74QtE8Gui8goHOMzPQeecNojwoonkBRTRPWBHNG75IlEdGmldg
+pHnGjDTveKMoD000L8FE85SZaN7yJlEem2leg5nmOTPTvOfNov9BMa5jT/4L
+Huauvw==
+      "]]}, {}}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{0, 0},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 100.}, {-10.720321932272851`, 10.73070319458213}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{3.6655993743298197`*^9, 3.6656005911343718`*^9, 
+  3.665602127003569*^9, 3.6656022551902514`*^9, 3.6656023461101913`*^9, 
+  3.6656024596994057`*^9, 3.665602660653509*^9, 3.665604703791144*^9, 
+  3.66638295149931*^9}]
+}, Open  ]],
+
+Cell["\<\
+This shows the fourth harmonic of the wave function for a particle in the \
+constructed infinite well, and its respective energy.\
+\>", "Text",
+ CellChangeTimes->{{3.6656023306553707`*^9, 3.6656023337669086`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"(", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"N", "[", 
+      RowBox[{"eigensystem", "[", 
+       RowBox[{"[", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "4"}]}], "]"}], "]"}], "]"}], " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"6.582", "*", 
+         RowBox[{"10", "^", 
+          RowBox[{"-", "16"}]}]}], ")"}], "^", "2"}], ")"}]}], ")"}], " ", 
+   "/", " ", 
+   RowBox[{"(", 
+    RowBox[{"2", " ", "*", " ", "m", " ", "*", " ", 
+     RowBox[{"(", 
+      RowBox[{"a", "^", "2"}], ")"}]}], ")"}]}], ")"}]], "Input",
+ CellChangeTimes->{{3.665599596979261*^9, 3.6655995972520094`*^9}, {
+  3.6656022298157425`*^9, 3.6656022322484455`*^9}, {3.665602319053625*^9, 
+  3.665602320831499*^9}, {3.6656051251490383`*^9, 3.6656051277516904`*^9}}],
+
+Cell[BoxData["2141.9781604130103`"], "Output",
+ CellChangeTimes->{3.6655995987456293`*^9, 3.665600591179993*^9, 
+  3.665602127081275*^9, 3.6656022551972723`*^9, 3.6656023461157064`*^9, 
+  3.6656024597049203`*^9, 3.665602660659528*^9, 3.66560470379716*^9, 
+  3.6656051775227175`*^9, 3.666382951506328*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ListPlot", "[", 
+  RowBox[{"eigensystem", "[", 
+   RowBox[{"[", 
+    RowBox[{"2", ",", 
+     RowBox[{"-", "4"}]}], "]"}], "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.665599342651042*^9, 3.6655993682377543`*^9}, 
+   3.665602236808378*^9}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.009166666666666668], 
+     AbsoluteThickness[1.6], PointBox[CompressedData["
+1:eJw9lXtIk2EUxqelppk501JzOtMkLMxlWmm145y3uam7uXlJwxSlxKB/KkxY
+FwgpSjSSYooitIgCSSy6bqZIBV4gFcogy7BQ/1hZaFmu4ntOg/Hx2/M+3/d+
+57znWWT5UV2lu0gkqvj7/XcVPk45rnb8QMVVevtthwu8inR+ucPjp70cAvvT
+/IemLs2AHziQGqU1w3XPA8DBpFBGdJ6cCgKH0WxI2dSYLRgspfYhqcvqsxG8
+idpKC60H3CXgaPLKO7agOR8OjqEgZ+q9w80R4C3U6q0syhRLwbHUEvquJzWE
+eRtVL6l7vPt4fRydtZ/qfzPG94unBWeaoaOWnyejitqvUbNNvJ8dNHA89leA
+KgScQIaVMc1RrevBO6lZWt/XfXUdOJHWvF3b+VjhD04iGX2Sj5Z4g3dRSeL7
+J4PDbuDd9NPeYGtcnEd995BYYXw65z0CTqbe0t+jXzw/oy8pVNX+cWzy9RJ4
+LyX4tCx6dniQwPvoRpGX84zLF7yf5pKti9bvYrCcoqqPzB2KDgIT1XRfuFLv
+2iCwhShtZLzMWhcKPZU2yyNtM5fCoKfSfevNazJZOHQFieJs9h/FEdAV9O1O
+fLbOQwo9jUrb4svlErAljdraz315OYP1IiVJBhsv9oexX0mipJ7l668k0NPp
+hUXlWxnIz0+nyEd3u3ynQ6BnUMqQuDdBy/vPoOyJrc/EBwOhZ1JybMeJnHC8
+vyWTpnOibQ2y1dCzaLApfGTi4QroWbR8y02yfW4B9c2msssP1E6vSYEt/xn9
+UfF6gS0qvp9D0HP4eQJbcng/0NW8X+hqfh/oGn5f6BquB/Rcrhf0XK4n9Dyu
+N/Q87gf0fO6XwJTP/cT6fO63wI58Pg/wa/m8wK/l8wS/ls8b/Fo+j/Dr+LzC
+r+PzDL+Oz7tQX4eO5wH11/O8CP0hPc8T+qXneRP669DzPAosMvC8CkwGnmeB
+LQaed/gNnAfwGzkv4DdynsBv5LyB38h5BH8B5xX8BZxn8Bdw3sFfwHkIv4nz
+En4T5yn8Js5b+E2cx/CbOa/hN3Oew2/mvIffzP8HmI9C3Mcp/wMKer5h
+      "]]}, {}}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{0, 0},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 100.}, {-8.057124203143015, 8.057124203143015}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{3.66559937509237*^9, 3.665600591938024*^9, 
+  3.6656021279280634`*^9, 3.6656022552228427`*^9, 3.6656023461382666`*^9, 
+  3.6656024597370057`*^9, 3.6656026607457633`*^9, 3.665604703844288*^9, 
+  3.666382951592559*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Exploring Progression of Error", "Section",
+ CellChangeTimes->{{3.6656020428582554`*^9, 3.6656020784003925`*^9}, {
+  3.6656023776687264`*^9, 3.6656023783089733`*^9}, {3.6663836817639027`*^9, 
+  3.666383691703511*^9}}],
+
+Cell["\<\
+Here we plot the actual eigenvalues (orange) against the eigenvalues obtained \
+via the approximation (blue) to show how accuracy is lost towards the \
+halfway-eigenvalue after which the approximation begins to deviate from the \
+actual value rapidly, converging on \
+\>", "Text",
+ CellChangeTimes->{{3.666383693591564*^9, 3.6663837643127923`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ListPlot", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Reverse", "[", 
+      RowBox[{"Eigenvalues", "[", "finiteDifferencesMatrix", "]"}], "]"}], 
+     ",", 
+     RowBox[{"Flatten", "[", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{
+         SuperscriptBox["a", "2"], "*", 
+         SuperscriptBox["x", "2"], "*", 
+         FractionBox[
+          SuperscriptBox["Pi", "2"], 
+          SuperscriptBox["A", "2"]]}], ",", 
+        RowBox[{"{", 
+         RowBox[{"x", ",", "100"}], "}"}]}], "]"}], "]"}]}], "}"}], ",", " ", 
+   RowBox[{"PlotRange", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", "4"}], "}"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.6663827940424695`*^9, 3.666382812604637*^9}, 
+   3.666382916864195*^9, {3.6663829763397503`*^9, 3.666382980042658*^9}, {
+   3.666383049860909*^9, 3.666383142018031*^9}, {3.6663833227791834`*^9, 
+   3.66638333742979*^9}, {3.6663836153444633`*^9, 3.666383639986195*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.009166666666666668], 
+     AbsoluteThickness[1.6], PointBox[CompressedData["
+1:eJw10nswlXkcx/HHpdxWDDbGYFHbFnK/hfgcd3I9h3O0k0tCTWbHUkyh5kHa
+Yom2NoldlxjWYCUb685utjG5jLINK7V1DHOw7qGlbcf3/Gae+c3rec/nv59e
+ZBw3WpJhmKiP3//3zllwem+a2RbX6O9EP1BZrulysSGOLIviLBmXreE0sjI8
+uT78kuobZDW8TWhZmX1UQNbAPeeVXuU/SslasA1XNQg/XEXWRUZsqpFPVj1Z
+H5c3GlPS5xvJ+2FjkS9qy28mH0B1Q1hofW07+SCqFL5azCrpJhvA6pl6qkfF
+b2Qj3BP2zvm+7SMbo85tJnHoRD/ZFCYjJ2SWFQfJZghbP90XnTJMNkfRT1F7
+zbJHyBZgeFdaXjQ9J1sidaSMO7L5J9kKuSnF23nHx8jWmO5cvZAy/BfZBvIX
+ZDlrJyfJtthvdSbCZNdr8hFEud+22x39N9kODhJPsg8OvSHbQ6LzfpSDu5Ds
+AKXa5c+Ej6fIR3Gpvuhib+A02RF3Yu0qE6dmyE6wKePF3rkiIgNnxg7b9hjO
+7ZgFkq0tnXLG56lzcFVtre+x1wJ1DkwHmjVqDi1Sd8ap7RYdB8Ul6s7IaB29
+xFkhMy6oH5jaTnu5TN0Ft1yni3v7V6i7Yt+voQX9ravUXWE/Op4SVrdG3Q3f
+BPdYovwddTfYSWlrWxauU3eH5T9VCls3N6i7g3doMzI0Z5O6B1hOh6769ffU
+PaDwu/qcKPNf6p4oFO0xKM7You6J5hJVqdm0bepeeKGSk3qX/UDdC7eSWjgf
+Xyd2ujfumyRty3WSWW9YZK2fNXOUoH4Mydrn5eTbyewxYLIk7ry9JHUfCETp
+foEtZNYHMdcMk9Ospaj74tTl+EXhAzLri6PPfxCGG0tT98MbNZWeoSoy64d5
+/WELTf1d1P3xy4SCmU4hmfVHdcG3TKfybuoBcCpT40xmkhGAQaZ84eQGmQ3A
+dEH5OYNYmR13BaB9VbpIa5zMBCJyyfxnLS9Z2gci5vpKvFITmQ1Egrrh52M6
+crQPhGZ0/PeRV8kMF3rPCvRuiMjgok1NqtndT572XGBodOrrOnIXFw2dihOr
+Cgq05+F03ZfxHTFk8PBoSfjFww4yy8OHhZc23aqf0J4HKc/XeUPRZCYIuQFG
+r54+JCMI+RU1tysYRdoHoSRxcNrVi9wVhNqzFhN3c8lMMFYYVY/vhsgIxlPz
+rEFdpT20D0ZFbOm6uTe5KxiV3fv0WtPIDB/t6Y7XaprI4MPdZCbgnVC85+Oc
+/KeZN1WUaM9HTFK5RoI9mRHAMkJ/NjuCDAG4e/wGR9PIrAAZDwQZ3j+K9wKs
+GS+0TTaL9yHQzNl7IG9AvA9BXWN1OP+VeB+CxPU2SeN58T4EgiP1parr4v1x
+1NpIP5HeVsJ/9Ve8nQ==
+      "]]}, 
+    {RGBColor[0.880722, 0.611041, 0.142051], PointSize[0.009166666666666668], 
+     AbsoluteThickness[1.6], PointBox[CompressedData["
+1:eJwtk3tMjXEch1+ldFWUSi6pEMdlRZRr30qpdDmdU+ecbLnWZC7NtQ3xYkNz
+yS1kU+MfmlnLmuUSSUaT6zCW7KSkaeg0Ti3MZec529nZc573876/3/f3eQNX
+5Oty7RRFyfn3/f9r+3RH5e5qjvKtToviD7FxPuwkFQVdXimvdsOe+GLYW/Zv
+b5t4teEM7Mf15+GRUuTe3tQadwkeQ74SDpKyjrxrVo9qeCz3q4HHy/qd2f3z
++mrhCdz/LqwR/08hWW1fGuDJPO8hPFX6PgfkJ7Q8gkN5/lM4TPJyDwaEfHwO
+T2M9L+Hpoo/dl7Nt8Ws4nPW9gWfInGLVsSy1GZ7JelvgCDk6ttaucZkZjmT9
+rfAs2V1zPfRyVhs8m/20w3Nko/3Mwz+OdcBz2V8nPE+WO0zzu+T8GZ7Pfrvg
+KEm7feV5fd0XWNj/NxurIqNOv3x3obkbH808LPhoOaEZmnfG2oOPYT7f8TFS
+VFrsEhP2Ax/LvKz4WPndltxQfrAXv4D59eEXiMU5qaTKoR8fxzx/4uNkpev+
+woLyX/h45vsbHy/GTvtCi+kPfiHzVsTmF0qu1tzoMXyAjZUE5g+rCZJ99r1Z
+LbHDJ3Ie9vhE8Xmxw74pcCA+ifOB1SQ50nsjzFLrgF/EeTniF8l9l9I13asH
+4ZM5Pyd8stxy9a1qHOeMT+E8XfApsrk/3K7QAiupnK8rPlW6XvcscXnshk/j
+vN3xaRJ8XvtgQ81gvJbz97CxaOXQ5Ivn3mZ5cr2WPsB1Wln1Z0v2qqVDyKfT
+D1jSJajRO/jD2qHk0+kLXJcutUV7vybu8SKvoz/e5HUSEV1/p6wcVnX0aRh5
+nRz/9uyUuQFW9PTLh7xemk5WbvLogVU9ffMlr5eO0CWGSSF+5DPoHywZYr73
+bn54znDyGfTRn3yGXE+ZNEVTASuZ9HME+UzZ9CQx0N0Kq5n0dST5THGLjxzR
+kjSKvIH+wmKQfdVW/7MXR5M30OcA8gbpPhTjGeQ4hryRfsNiFLeblpJ1t2DV
+SN8DyRultP1AWeVWWDHRf1hMUuLspOkMDyJv4n2A60wyQJMf6dsLK1m8H8Hy
+Fz2ZvOU=
+      "]]}, {}}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{0, 0},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 100.}, {0, 4}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {0, 0}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{{3.666383105035346*^9, 3.666383121596547*^9}, 
+   3.666383339971071*^9, 3.666383649741252*^9}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1920, 1007},
+WindowMargins->{{-8, Automatic}, {Automatic, -8}},
+FrontEndVersion->"10.3 for Microsoft Windows (64-bit) (October 9, 2015)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 375, 8, 85, "Text"],
+Cell[CellGroupData[{
+Cell[958, 32, 103, 1, 63, "Section"],
+Cell[1064, 35, 828, 26, 72, "Text"],
+Cell[1895, 63, 912, 22, 72, "Input"],
+Cell[2810, 87, 162, 3, 30, "Text"],
+Cell[2975, 92, 277, 5, 31, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3289, 102, 105, 1, 63, "Section"],
+Cell[3397, 105, 839, 22, 92, "Input"],
+Cell[4239, 129, 195, 4, 30, "Text"],
+Cell[4437, 135, 1045, 21, 112, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5519, 161, 183, 2, 63, "Section"],
+Cell[5705, 165, 144, 1, 30, "Text"],
+Cell[5852, 168, 221, 5, 31, "Input"],
+Cell[6076, 175, 248, 5, 30, "Text"],
+Cell[CellGroupData[{
+Cell[6349, 184, 904, 24, 31, "Input"],
+Cell[7256, 210, 306, 4, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7599, 219, 236, 6, 31, "Input"],
+Cell[7838, 227, 2060, 44, 244, "Output"]
+}, Open  ]],
+Cell[9913, 274, 221, 4, 30, "Text"],
+Cell[CellGroupData[{
+Cell[10159, 282, 818, 23, 31, "Input"],
+Cell[10980, 307, 306, 4, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11323, 316, 267, 7, 31, "Input"],
+Cell[11593, 325, 2160, 46, 228, "Output"]
+}, Open  ]],
+Cell[13768, 374, 218, 4, 30, "Text"],
+Cell[CellGroupData[{
+Cell[14011, 382, 824, 23, 31, "Input"],
+Cell[14838, 407, 304, 4, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15179, 416, 285, 7, 31, "Input"],
+Cell[15467, 425, 2133, 46, 228, "Output"]
+}, Open  ]],
+Cell[17615, 474, 223, 4, 30, "Text"],
+Cell[CellGroupData[{
+Cell[17863, 482, 824, 23, 31, "Input"],
+Cell[18690, 507, 304, 4, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19031, 516, 263, 7, 31, "Input"],
+Cell[19297, 525, 2179, 46, 233, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21525, 577, 223, 3, 63, "Section"],
+Cell[21751, 582, 358, 6, 30, "Text"],
+Cell[CellGroupData[{
+Cell[22134, 592, 981, 25, 50, "Input"],
+Cell[23118, 619, 3576, 70, 291, "Output"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
