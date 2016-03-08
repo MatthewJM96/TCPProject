@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    113057,       2068]
-NotebookOptionsPosition[    111707,       2021]
-NotebookOutlinePosition[    112053,       2036]
-CellTagsIndexPosition[    112010,       2033]
+NotebookDataLength[    113316,       2074]
+NotebookOptionsPosition[    111968,       2027]
+NotebookOutlinePosition[    112311,       2042]
+CellTagsIndexPosition[    112268,       2039]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -358,7 +358,10 @@ Cell["Plot results!", "Text",
 Cell[CellGroupData[{
 
 Cell[BoxData[
- RowBox[{"ListPlot3D", "[", "plot", "]"}]], "Input"],
+ RowBox[{"ListPlot3D", "[", 
+  RowBox[{"plot", ",", 
+   RowBox[{"BoxRatios", "\[Rule]", "Automatic"}]}], "]"}]], "Input",
+ CellChangeTimes->{3.6664294371205077`*^9}],
 
 Cell[BoxData[
  Graphics3DBox[GraphicsComplex3DBox[CompressedData["
@@ -1129,10 +1132,10 @@ s/CH8Q==
     "]],
   Axes->True,
   AxesLabel->{None, None, None},
-  BoxRatios->{1, 1, 0.4},
   DisplayFunction->Identity,
   FaceGridsStyle->Automatic,
-  ImageSize->{435.9907697099414, 288.5604714664208},
+  ImageSize->{429.4328140259598, 213.37676126705117`},
+  ImageSizeRaw->Automatic,
   Method->{"DefaultBoundaryStyle" -> Directive[
       GrayLevel[0.3]], "RotationControl" -> "Globe"},
   PlotRange->{{0., 5.}, {0., 11.}, {-1.2579229406167827`, 1.283746294571543}},
@@ -1141,13 +1144,14 @@ s/CH8Q==
     Scaled[0.02], 
     Scaled[0.02]},
   Ticks->{Automatic, Automatic, Automatic},
-  ViewPoint->{-3.049150734936748, 0.162231738173316, 1.4582046011324734`},
+  ViewPoint->{2.5557346128098333`, 0.24471562612415468`, 2.2041630727367796`},
   ViewVertical->{0., 0., 1.}]], "Output",
  CellChangeTimes->{
   3.666381681057109*^9, 3.666381767357606*^9, {3.6663820119788337`*^9, 
    3.666382040732335*^9}, 3.6663820786582885`*^9, 3.666382229148876*^9, {
    3.6663822910898113`*^9, 3.6663823171776347`*^9}, 3.666428221623304*^9, 
-   3.666428344153512*^9, 3.6664286518255653`*^9}]
+   3.666428344153512*^9, 3.6664286518255653`*^9, {3.666429441115372*^9, 
+   3.6664294479829025`*^9}}]
 }, Open  ]],
 
 Cell["Plot of the square of the wavefunction:", "Text",
@@ -1230,8 +1234,11 @@ Cell[BoxData[{
         RowBox[{
          RowBox[{"nx", "+", "1"}], ",", "y", ",", "0"}], "}"}]}], "]"}]}], 
     "]"}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
- RowBox[{"ListPlot3D", "[", "plot2", "]"}]}], "Input",
- CellChangeTimes->{{3.666428142400731*^9, 3.6664281857772665`*^9}}],
+ RowBox[{"ListPlot3D", "[", 
+  RowBox[{"plot2", ",", 
+   RowBox[{"BoxRatios", "\[Rule]", "Automatic"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.666428142400731*^9, 3.6664281857772665`*^9}, 
+   3.666429438624599*^9}],
 
 Cell[BoxData[
  Graphics3DBox[GraphicsComplex3DBox[CompressedData["
@@ -2000,7 +2007,6 @@ IGnYjJh9dh6INpN0Bm8Cjqp665ZI8OBhsknt3tQ5+B9mVKHc
     "]],
   Axes->True,
   AxesLabel->{None, None, None},
-  BoxRatios->{1, 1, 0.4},
   DisplayFunction->Identity,
   FaceGridsStyle->Automatic,
   ImageSize->{381.3061499586659, 276.23273759057446`},
@@ -2012,15 +2018,15 @@ IGnYjJh9dh6INpN0Bm8Cjqp665ZI8OBhsknt3tQ5+B9mVKHc
     Scaled[0.02], 
     Scaled[0.02]},
   Ticks->{Automatic, Automatic, Automatic},
-  ViewPoint->{-0.6954003040355444, -2.6615588957446423`, 1.9704118000128374`},
+  ViewPoint->{-2.331583746962784, 0.01206413608899038, 2.452258487092951},
   ViewVertical->{0., 0., 1.}]], "Output",
  CellChangeTimes->{3.6664282216748896`*^9, 3.666428344243287*^9, 
-  3.6664286518814344`*^9}]
+  3.6664286518814344`*^9, 3.6664294480230083`*^9}]
 }, Open  ]]
 }, Open  ]]
 },
-WindowSize->{1920, 1007},
-WindowMargins->{{-8, Automatic}, {Automatic, -8}},
+WindowSize->{958, 998},
+WindowMargins->{{Automatic, -7}, {Automatic, 0}},
 FrontEndVersion->"10.3 for Microsoft Windows (64-bit) (October 9, 2015)",
 StyleDefinitions->"Default.nb"
 ]
@@ -2061,13 +2067,13 @@ Cell[10373, 267, 248, 5, 30, "Text"],
 Cell[10624, 274, 2549, 78, 112, "Input"],
 Cell[13176, 354, 97, 1, 30, "Text"],
 Cell[CellGroupData[{
-Cell[13298, 359, 66, 1, 31, "Input"],
-Cell[13367, 362, 48061, 787, 304, "Output"]
+Cell[13298, 359, 179, 4, 31, "Input"],
+Cell[13480, 365, 48120, 788, 228, "Output"]
 }, Open  ]],
-Cell[61443, 1152, 121, 1, 30, "Text"],
+Cell[61615, 1156, 121, 1, 30, "Text"],
 Cell[CellGroupData[{
-Cell[61589, 1157, 2328, 76, 152, "Input"],
-Cell[63920, 1235, 47759, 782, 291, "Output"]
+Cell[61761, 1161, 2423, 79, 152, "Input"],
+Cell[64187, 1242, 47753, 781, 291, "Output"]
 }, Open  ]]
 }, Open  ]]
 }
